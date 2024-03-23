@@ -1,0 +1,25 @@
+<button (click)="navigateToAddEmployee()">Add Employee</button>
+
+<table>
+    <thead>
+      <tr>
+        <th>Employee First Name</th>
+        <th>Employee Last Name</th>
+        <th>Employee Email</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let employee of employees">
+        <td>{{ employee.first_name }}</td>
+        <td>{{ employee.last_name }}</td>
+        <td>{{ employee.email }}</td>
+        <td>
+          <button (click)="viewEmployee(employee._id)">View Employee</button>
+          <button (click)="updateEmployee(employee._id)">Update Employee</button>
+          <button (click)="deleteEmployee(employee._id)">Delete Employee</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  
