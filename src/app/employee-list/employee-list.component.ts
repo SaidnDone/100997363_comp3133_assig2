@@ -25,7 +25,7 @@ export class EmployeeListComponent implements OnInit {
   deleteEmployee(employeeId: string) {
     this.employeeService.deleteEmployee(employeeId).subscribe(() => {
       // Remove the deleted employee from the UI
-      this.employees = this.employees.filter(e => e._id !== employeeId);
+      this.employees = this.employees.filter(e => e.id !== employeeId);
     });
   }
 }

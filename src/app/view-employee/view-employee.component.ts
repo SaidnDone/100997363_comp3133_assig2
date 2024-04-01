@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { EmployeeService } from '../services/employee.service';
+import { Apollo } from 'apollo-angular';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+import gql from 'graphql-tag';
 import { Employee } from '../models/employee.model';
 
 @Component({
@@ -10,9 +13,9 @@ import { Employee } from '../models/employee.model';
 })
 export class ViewEmployeeComponent implements OnInit {
   employeeId!: string;
-  employee!: Employee;
+  employee$!: Observable<Employee>;
 
-  constructor(private route: ActivatedRoute, private employeeService: EmployeeService) { }
+  constructor(private route: ActivatedRoute, private apollo: Apollo) { }
 
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
@@ -22,7 +25,25 @@ export class ViewEmployeeComponent implements OnInit {
   }
 
   getEmployee(): void {
-    this.employeeService.getEmployeeById(this.employeeId)
-      .subscribe(employee => this.employee = employee);
+    this.employee$ = this.apollo.watchQuery<any>({
+      query: gql`
+        query GetEmployee($id: ID!) {
+          getEmployeeById(id: $id) {
+            id
+            first_name
+            last_name
+            email
+            gender
+            salary
+            // Add other fields you need
+          }
+        }
+      `,
+      variables: {
+        id: this.employeeId
+      }
+    }).valueChanges.pipe(
+      map(result => result.data.getEmployeeById)
+    );
   }
 }

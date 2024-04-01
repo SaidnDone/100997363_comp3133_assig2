@@ -1,35 +1,127 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { Apollo } from 'apollo-angular';
 import { Observable } from 'rxjs';
+import gql from 'graphql-tag';
+import { map } from 'rxjs/operators';
 import { Employee } from '../models/employee.model';
 import { EmployeeInput } from '../models/employee.model';
-
 
 @Injectable({
   providedIn: 'root'
 })
 export class EmployeeService {
-  private apiUrl = '/employee'; // Update the base URL to match your backend API endpoint
-
-  constructor(private http: HttpClient) { }
+  constructor(private apollo: Apollo) { }
 
   getAllEmployees(): Observable<Employee[]> {
-    return this.http.get<Employee[]>(`${this.apiUrl}/getAllEmployees`);
+    return this.apollo.watchQuery<any>({
+      query: gql`
+        query {
+          getAllEmployees {
+            id
+            firstName
+            lastName
+            email
+            gender
+            salary
+            // Add other fields you need
+          }
+        }
+      `
+    }).valueChanges.pipe(
+      map(result => result.data.getAllEmployees)
+    );
   }
 
   getEmployeeById(id: string): Observable<Employee> {
-    return this.http.get<Employee>(`${this.apiUrl}/searchEmployeeByEid/${id}`);
+    return this.apollo.watchQuery<any>({
+      query: gql`
+        query GetEmployeeById($id: ID!) {
+          getEmployeeById(id: $id) {
+            id
+            firstName
+            lastName
+            email
+            gender
+            salary
+            // Add other fields you need
+          }
+        }
+      `,
+      variables: {
+        id: id
+      }
+    }).valueChanges.pipe(
+      map(result => result.data.getEmployeeById)
+    );
   }
 
   addEmployee(employeeData: EmployeeInput): Observable<Employee> {
-    return this.http.post<Employee>(`${this.apiUrl}/addNewEmployee`, employeeData);
+    return this.apollo.mutate<any>({
+      mutation: gql`
+        mutation AddEmployee($input: EmployeeInput!) {
+          addEmployee(input: $input) {
+            id
+            firstName
+            lastName
+            email
+            gender
+            salary
+            // Add other fields you need
+          }
+        }
+      `,
+      variables: {
+        input: employeeData
+      }
+    }).pipe(
+      map(result => result.data.addEmployee)
+    );
   }
 
   updateEmployee(employeeId: string, employeeData: EmployeeInput): Observable<Employee> {
-    return this.http.put<Employee>(`${this.apiUrl}/updateEmployeeByEid/${employeeId}`, employeeData);
+    return this.apollo.mutate<any>({
+      mutation: gql`
+        mutation UpdateEmployee($id: ID!, $input: EmployeeInput!) {
+          updateEmployee(id: $id, input: $input) {
+            id
+            firstName
+            lastName
+            email
+            gender
+            salary
+            // Add other fields you need
+          }
+        }
+      `,
+      variables: {
+        id: employeeId,
+        input: employeeData
+      }
+    }).pipe(
+      map(result => result.data.updateEmployee)
+    );
   }
 
   deleteEmployee(employeeId: string): Observable<Employee> {
-    return this.http.delete<Employee>(`${this.apiUrl}/deleteEmployeeByEid/${employeeId}`);
+    return this.apollo.mutate<any>({
+      mutation: gql`
+        mutation DeleteEmployee($id: ID!) {
+          deleteEmployee(id: $id) {
+            id
+            firstName
+            lastName
+            email
+            gender
+            salary
+            // Add other fields you need
+          }
+        }
+      `,
+      variables: {
+        id: employeeId
+      }
+    }).pipe(
+      map(result => result.data.deleteEmployee)
+    );
   }
 }

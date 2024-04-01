@@ -10,7 +10,7 @@ import { Employee } from '../models/employee.model';
 })
 export class UpdateEmployeeComponent implements OnInit {
   employeeId: string | null = null; // Initialize employeeId to null
-  employee: Employee = { _id: '', first_name: '', last_name: '', email: '', gender: '', salary: 0 };
+  employee: Employee = { id: '', first_name: '', last_name: '', email: '', gender: '', salary: 0 };
 
   constructor(private route: ActivatedRoute, private employeeService: EmployeeService) { }
 
